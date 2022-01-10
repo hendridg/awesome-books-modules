@@ -1,25 +1,28 @@
 import { DateTime } from 'luxon';
-const listBooks = document.querySelector('.list-books');
+import Book from './modules/index.js';
+
 const form = document.querySelector('.form-input');
 const [title, author] = form.elements;
 const [navList, navAdd, navContact] = document.querySelectorAll('.list-item');
 const allBooks = document.querySelector('.all-books');
 const addBook = document.querySelector('.add-book');
 const contact = document.querySelector('.contact');
+const divTime = document.querySelector('.date-time');
 
-now = DateTime.now();
-later = DateTime.local(2020, 10, 12);
-i = Interval.fromDateTimes(now, later);
+function setDate() {
+  const dt = DateTime.now();
+  divTime.textContent = dt.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS);
+}
 
-i.length(); //=> 97098768468
-i.length('years'); //=> 3.0762420239726027
-i.contains(DateTime.local(2019)); //=> true
+setInterval(setDate, 1000);
+
+setDate();
 
 const inputBook = {};
-let books = new Array([]);
+const objBook = new Book();
 
 if (localStorage.savedBooks) {
-  books = JSON.parse(localStorage.getItem('savedBooks'));
+  objBook.books = JSON.parse(localStorage.getItem('savedBooks'));
 }
 
 navList.addEventListener('click', () => {
@@ -49,57 +52,14 @@ author.addEventListener('change', () => {
 });
 
 const populateFields = () => {
-  localStorage.setItem('savedBooks', JSON.stringify(books));
-};
-
-const Book = class {
-  constructor(title, author) {
-    this.title = title;
-    this.author = author;
-  }
-
-  static removeBook(book) {
-    const result = books.filter((b) => b !== book);
-    books = result;
-    populateFields();
-  }
-
-  static addBook = (newBook) => {
-    books.push(newBook);
-    populateFields();
-    this.displayBooks();
-  };
-
-  static displayBooks = () => {
-    listBooks.innerHTML = '';
-    books.map((book) => {
-      const bookDiv = document.createElement('tr');
-      const elementBook = document.createElement('td');
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = 'Remove';
-
-      elementBook.textContent = `"${book.title}" by ${book.author}`;
-
-      bookDiv.classList.add('book-container');
-      bookDiv.appendChild(elementBook);
-      bookDiv.appendChild(deleteBtn);
-
-      listBooks.appendChild(bookDiv);
-
-      deleteBtn.addEventListener('click', () => {
-        this.removeBook(book);
-        listBooks.removeChild(bookDiv);
-      });
-      return listBooks;
-    });
-  };
+  localStorage.setItem('savedBooks', JSON.stringify(objBook.books));
 };
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  Book.addBook(new Book(inputBook.title, inputBook.author));
+  objBook.addBook(new Book(inputBook.title, inputBook.author));
   form.submit();
 });
 
-Book.displayBooks();
+objBook.displayBooks();
 populateFields();
