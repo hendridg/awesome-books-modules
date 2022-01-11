@@ -9,14 +9,10 @@ const addBook = document.querySelector('.add-book');
 const contact = document.querySelector('.contact');
 const divTime = document.querySelector('.date-time');
 
-function setDate() {
+setInterval(() => {
   const dt = DateTime.now();
   divTime.textContent = dt.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS);
-}
-
-setInterval(setDate, 1000);
-
-setDate();
+}, 1000);
 
 const inputBook = {};
 const objBook = new Book();
