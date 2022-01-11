@@ -8663,12 +8663,13 @@ exports.Settings = Settings;
 exports.SystemZone = SystemZone;
 exports.VERSION = VERSION;
 exports.Zone = Zone;
-},{}],"index.js":[function(require,module,exports) {
+},{}],"modules/index.js":[function(require,module,exports) {
 "use strict";
 
-var _luxon = require("luxon");
-
-var _class, _temp;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -8677,6 +8678,78 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var listBooks = document.querySelector('.list-books');
+
+var Book = /*#__PURE__*/function () {
+  function Book(title, author) {
+    var _this = this;
+
+    _classCallCheck(this, Book);
+
+    _defineProperty(this, "populateFields", function () {
+      localStorage.setItem('savedBooks', JSON.stringify(_this.books));
+    });
+
+    _defineProperty(this, "addBook", function (newBook) {
+      _this.books.push(newBook);
+
+      _this.populateFields();
+
+      _this.displayBooks();
+    });
+
+    _defineProperty(this, "displayBooks", function () {
+      listBooks.innerHTML = '';
+
+      _this.books.map(function (book) {
+        var bookDiv = document.createElement('tr');
+        var elementBook = document.createElement('td');
+        var deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Remove';
+        elementBook.textContent = "\"".concat(book.title, "\" by ").concat(book.author);
+        bookDiv.classList.add('book-container');
+        bookDiv.appendChild(elementBook);
+        bookDiv.appendChild(deleteBtn);
+        listBooks.appendChild(bookDiv);
+        deleteBtn.addEventListener('click', function () {
+          _this.removeBook(book);
+
+          listBooks.removeChild(bookDiv);
+        });
+        return listBooks;
+      });
+    });
+
+    this.title = title;
+    this.author = author;
+    this.books = new Array([]);
+  }
+
+  _createClass(Book, [{
+    key: "removeBook",
+    value: function removeBook(book) {
+      var result = this.books.filter(function (b) {
+        return b !== book;
+      });
+      this.books = result;
+      this.populateFields();
+    }
+  }]);
+
+  return Book;
+}();
+
+var _default = Book;
+exports.default = _default;
+},{}],"index.js":[function(require,module,exports) {
+"use strict";
+
+var _luxon = require("luxon");
+
+var _index = _interopRequireDefault(require("./modules/index"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
@@ -8690,7 +8763,6 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-var listBooks = document.querySelector('.list-books');
 var form = document.querySelector('.form-input');
 
 var _form$elements = _slicedToArray(form.elements, 2),
@@ -8706,20 +8778,23 @@ var _document$querySelect = document.querySelectorAll('.list-item'),
 var allBooks = document.querySelector('.all-books');
 var addBook = document.querySelector('.add-book');
 var contact = document.querySelector('.contact');
-now = _luxon.DateTime.now();
-later = _luxon.DateTime.local(2020, 10, 12);
-i = Interval.fromDateTimes(now, later);
-i.length(); //=> 97098768468
+var divDateTime = document.querySelector('.date-time');
 
-i.length('years'); //=> 3.0762420239726027
+function setDate() {
+  var now = new Date();
 
-i.contains(_luxon.DateTime.local(2019)); //=> true
+  var dt = _luxon.DateTime.now();
 
+  divDateTime.innerHTML = "".concat(dt.toLocaleString(_luxon.DateTime.DATETIME_FULL_WITH_SECONDS));
+}
+
+setInterval(setDate, 1000);
+setDate();
 var inputBook = {};
-var books = new Array([]);
+var objBook = new _index.default();
 
 if (localStorage.savedBooks) {
-  books = JSON.parse(localStorage.getItem('savedBooks'));
+  objBook.books = JSON.parse(localStorage.getItem('savedBooks'));
 }
 
 navList.addEventListener('click', function () {
@@ -8745,62 +8820,18 @@ author.addEventListener('change', function () {
 });
 
 var populateFields = function populateFields() {
-  localStorage.setItem('savedBooks', JSON.stringify(books));
+  localStorage.setItem('savedBooks', JSON.stringify(objBook.books));
 };
 
-var Book = (_temp = _class = /*#__PURE__*/function () {
-  function Book(title, author) {
-    _classCallCheck(this, Book);
-
-    this.title = title;
-    this.author = author;
-  }
-
-  _createClass(Book, null, [{
-    key: "removeBook",
-    value: function removeBook(book) {
-      var result = books.filter(function (b) {
-        return b !== book;
-      });
-      books = result;
-      populateFields();
-    }
-  }]);
-
-  return Book;
-}(), _defineProperty(_class, "addBook", function (newBook) {
-  books.push(newBook);
-  populateFields();
-
-  _class.displayBooks();
-}), _defineProperty(_class, "displayBooks", function () {
-  listBooks.innerHTML = '';
-  books.map(function (book) {
-    var bookDiv = document.createElement('tr');
-    var elementBook = document.createElement('td');
-    var deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Remove';
-    elementBook.textContent = "\"".concat(book.title, "\" by ").concat(book.author);
-    bookDiv.classList.add('book-container');
-    bookDiv.appendChild(elementBook);
-    bookDiv.appendChild(deleteBtn);
-    listBooks.appendChild(bookDiv);
-    deleteBtn.addEventListener('click', function () {
-      _class.removeBook(book);
-
-      listBooks.removeChild(bookDiv);
-    });
-    return listBooks;
-  });
-}), _temp);
 form.addEventListener('submit', function (e) {
   e.preventDefault();
-  Book.addBook(new Book(inputBook.title, inputBook.author));
+  objBook.addBook(new _index.default(inputBook.title, inputBook.author));
+  console.log(objBook.books);
   form.submit();
 });
-Book.displayBooks();
+objBook.displayBooks();
 populateFields();
-},{"luxon":"node_modules/luxon/build/cjs-browser/luxon.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"luxon":"node_modules/luxon/build/cjs-browser/luxon.js","./modules/index":"modules/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -8828,7 +8859,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38127" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42219" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
